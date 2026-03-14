@@ -1,0 +1,43 @@
+|--- close_to_SMA <= -0.03
+|   |--- price_range <= 0.04
+|   |   |--- return_lag_1 <= -0.02
+|   |   |   |--- volatility_20 <= 0.02
+|   |   |   |   |--- value: [0.01]
+|   |   |   |--- volatility_20 >  0.02
+|   |   |   |   |--- value: [0.01]
+|   |   |--- return_lag_1 >  -0.02
+|   |   |   |--- volatility_20 <= 0.01
+|   |   |   |   |--- value: [0.00]
+|   |   |   |--- volatility_20 >  0.01
+|   |   |   |   |--- value: [0.01]
+|   |--- price_range >  0.04
+|   |   |--- close_to_SMA <= -0.15
+|   |   |   |--- value: [0.03]
+|   |   |--- close_to_SMA >  -0.15
+|   |   |   |--- price_momentum_20 <= -0.21
+|   |   |   |   |--- value: [-0.00]
+|   |   |   |--- price_momentum_20 >  -0.21
+|   |   |   |   |--- value: [0.01]
+|--- close_to_SMA >  -0.03
+|   |--- volatility_20 <= 0.01
+|   |   |--- close_position <= 0.92
+|   |   |   |--- BB_width <= 0.04
+|   |   |   |   |--- value: [-0.00]
+|   |   |   |--- BB_width >  0.04
+|   |   |   |   |--- value: [0.00]
+|   |   |--- close_position >  0.92
+|   |   |   |--- MACD <= 1.99
+|   |   |   |   |--- value: [-0.00]
+|   |   |   |--- MACD >  1.99
+|   |   |   |   |--- value: [-0.01]
+|   |--- volatility_20 >  0.01
+|   |   |--- RSI_14 <= 57.73
+|   |   |   |--- volatility_20 <= 0.03
+|   |   |   |   |--- value: [0.00]
+|   |   |   |--- volatility_20 >  0.03
+|   |   |   |   |--- value: [0.01]
+|   |   |--- RSI_14 >  57.73
+|   |   |   |--- return <= 0.00
+|   |   |   |   |--- value: [0.00]
+|   |   |   |--- return >  0.00
+|   |   |   |   |--- value: [0.00]

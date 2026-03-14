@@ -1,0 +1,38 @@
+{
+  "config": {
+    "scenario": "future_5d",
+    "task": "regression",
+    "train_path": "/Users/zhangximing/Desktop/eda_plots/ml_data/stock_data_future_5d_train.csv",
+    "valid_path": "/Users/zhangximing/Desktop/eda_plots/ml_data/stock_data_future_5d_valid.csv",
+    "output_dir": "/Users/zhangximing/Desktop/eda_plots/model_outputs/future_5d_decision_tree",
+    "features": [
+      "return",
+      "log_return",
+      "close_to_SMA",
+      "RSI_14",
+      "MACD",
+      "MACD_hist",
+      "BB_width",
+      "volatility_20",
+      "price_momentum_20",
+      "volume_ratio",
+      "close_position",
+      "return_lag_1",
+      "daily_return",
+      "price_range"
+    ],
+    "target": "target_return_5d",
+    "max_depth": 4,
+    "min_samples_leaf": 500,
+    "random_state": 42,
+    "train_rows": 481867,
+    "valid_rows": 122037,
+    "dry_run": false
+  },
+  "validation_metrics": {
+    "mae": 0.02240944530477179,
+    "rmse": 0.0323946463135542,
+    "r2": -0.01047298382360462,
+    "directional_accuracy": 0.5314781582634774
+  }
+}

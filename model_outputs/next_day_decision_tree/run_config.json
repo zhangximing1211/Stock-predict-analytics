@@ -1,0 +1,30 @@
+{
+  "scenario": "next_day",
+  "task": "classification",
+  "train_path": "/Users/zhangximing/Desktop/eda_plots/ml_data/stock_data_next_day_train.csv",
+  "valid_path": "/Users/zhangximing/Desktop/eda_plots/ml_data/stock_data_next_day_valid.csv",
+  "output_dir": "/Users/zhangximing/Desktop/eda_plots/model_outputs/next_day_decision_tree",
+  "features": [
+    "return",
+    "log_return",
+    "close_to_SMA",
+    "RSI_14",
+    "MACD",
+    "MACD_hist",
+    "BB_width",
+    "volatility_20",
+    "price_momentum_20",
+    "volume_ratio",
+    "close_position",
+    "return_lag_1",
+    "daily_return",
+    "price_range"
+  ],
+  "target": "target_up_1d",
+  "max_depth": 4,
+  "min_samples_leaf": 500,
+  "random_state": 42,
+  "train_rows": 483867,
+  "valid_rows": 124057,
+  "dry_run": false
+}

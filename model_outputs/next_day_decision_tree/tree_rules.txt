@@ -1,0 +1,46 @@
+|--- return <= -0.00
+|   |--- MACD_hist <= -0.16
+|   |   |--- daily_return <= 0.00
+|   |   |   |--- return_lag_1 <= -0.03
+|   |   |   |   |--- class: 1.0
+|   |   |   |--- return_lag_1 >  -0.03
+|   |   |   |   |--- class: 1.0
+|   |   |--- daily_return >  0.00
+|   |   |   |--- return <= -0.02
+|   |   |   |   |--- class: 0.0
+|   |   |   |--- return >  -0.02
+|   |   |   |   |--- class: 0.0
+|   |--- MACD_hist >  -0.16
+|   |   |--- volume_ratio <= 0.55
+|   |   |   |--- BB_width <= 0.10
+|   |   |   |   |--- class: 0.0
+|   |   |   |--- BB_width >  0.10
+|   |   |   |   |--- class: 1.0
+|   |   |--- volume_ratio >  0.55
+|   |   |   |--- RSI_14 <= 76.53
+|   |   |   |   |--- class: 1.0
+|   |   |   |--- RSI_14 >  76.53
+|   |   |   |   |--- class: 0.0
+|--- return >  -0.00
+|   |--- RSI_14 <= 60.61
+|   |   |--- close_to_SMA <= -0.03
+|   |   |   |--- return <= 0.03
+|   |   |   |   |--- class: 1.0
+|   |   |   |--- return >  0.03
+|   |   |   |   |--- class: 1.0
+|   |   |--- close_to_SMA >  -0.03
+|   |   |   |--- log_return <= 0.01
+|   |   |   |   |--- class: 0.0
+|   |   |   |--- log_return >  0.01
+|   |   |   |   |--- class: 0.0
+|   |--- RSI_14 >  60.61
+|   |   |--- MACD_hist <= 0.05
+|   |   |   |--- close_to_SMA <= 0.00
+|   |   |   |   |--- class: 1.0
+|   |   |   |--- close_to_SMA >  0.00
+|   |   |   |   |--- class: 0.0
+|   |   |--- MACD_hist >  0.05
+|   |   |   |--- RSI_14 <= 68.77
+|   |   |   |   |--- class: 0.0
+|   |   |   |--- RSI_14 >  68.77
+|   |   |   |   |--- class: 0.0
