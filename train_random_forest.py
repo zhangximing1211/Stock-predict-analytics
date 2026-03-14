@@ -28,7 +28,17 @@ BASE_FEATURES = [
     "price_range",
 ]
 
-DEFAULT_FEATURES = BASE_FEATURES + ENGINEERED_FEATURES
+# Market-level features to exclude (same value for all stocks on a given day,
+# they dominate importance but add no stock-selection power).
+MARKET_FEATURES = {
+    "market_return_mean_1d",
+    "market_volatility_mean_20",
+    "market_up_ratio_1d",
+}
+
+DEFAULT_FEATURES = BASE_FEATURES + [
+    f for f in ENGINEERED_FEATURES if f not in MARKET_FEATURES
+]
 
 
 SCENARIO_CONFIG = {
@@ -67,24 +77,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--n-estimators",
         type=int,
-        default=200,
+        default=300,
         help="Number of trees in the forest.",
     )
     parser.add_argument(
         "--max-depth",
         type=int,
-        default=12,
+        default=5,
         help="Maximum depth of each tree.",
     )
     parser.add_argument(
         "--min-samples-leaf",
         type=int,
-        default=50,
+        default=300,
         help="Minimum number of samples per leaf.",
     )
     parser.add_argument(
         "--max-features",
-        default="sqrt",
+        default="0.3",
         help="Feature sampling strategy: sqrt, log2, none, int, or float.",
     )
     parser.add_argument(

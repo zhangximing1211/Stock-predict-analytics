@@ -1,0 +1,22 @@
+# Data files
+*.csv
+
+# Model artifacts
+*.pkl
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# R
+.Rhistory
+
+# Plots (regenerable)
+eda_plots/

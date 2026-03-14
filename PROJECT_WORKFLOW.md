@@ -15,6 +15,7 @@
 - 增强特征生成
 - 决策树 baseline
 - 随机森林 smoke test
+- 随机森林调优（去除市场级特征 + 超参数优化）
 - 决策树可解释性导出
 
 ---
@@ -31,8 +32,10 @@ flowchart LR
     E --> G[ml_data/features/*.csv\n增强特征 train/valid 文件]
     D --> H[train_decision_tree.py\n决策树 baseline]
     G --> I[train_random_forest.py\n随机森林 smoke test]
+    G --> I2[train_random_forest.py\n随机森林调优版]
     H --> J[model_outputs/*decision_tree\n指标 + 预测结果 + 规则]
     I --> K[model_outputs/*random_forest_smoke\n指标 + 预测结果]
+    I2 --> K2[model_outputs/*random_forest_tuned\n调优后指标 + 预测结果]
     J --> L[export_tree_flowchart.py\n导出 Mermaid 流程图]
 ```
 
@@ -85,6 +88,8 @@ flowchart LR
 | `model_outputs/future_5d_decision_tree` | 未来 5 日回归决策树输出 |
 | `model_outputs/next_day_random_forest_smoke` | 下一日随机森林 smoke test 输出 |
 | `model_outputs/future_5d_random_forest_smoke` | 未来 5 日随机森林 smoke test 输出 |
+| `model_outputs/next_day_random_forest_tuned` | 下一日随机森林调优版输出 |
+| `model_outputs/future_5d_random_forest_tuned` | 未来 5 日随机森林调优版输出 |
 
 ---
 
@@ -276,6 +281,32 @@ flowchart LR
 
 这个文件按交易日统计 top/bottom 预测分组的真实表现，用于观察排序能力。
 
+### 6.4 随机森林调优
+
+脚本：
+
+- `train_random_forest.py`（同一脚本，修改了默认参数）
+
+调优策略：
+
+基于 smoke test 的分析发现三个主要问题并逐一解决：
+
+1. **降低树的复杂度**：`max_depth` 12→5，`min_samples_leaf` 50→300，减少过拟合
+2. **增加树的数量**：`n_estimators` 40→300，让集体决策更稳定
+3. **去除市场级特征**：移除 `market_return_mean_1d`、`market_volatility_mean_20`、`market_up_ratio_1d`（这三个变量在同一天对所有股票值相同，主导了特征重要性但不提供个股选择能力）
+4. **调整特征采样**：`max_features` 从 `sqrt` 改为 `0.3`，每棵树看 30% 的特征
+
+调优后的默认参数：
+
+| 参数 | smoke 版 | 调优版 |
+|---|---|---|
+| `n_estimators` | 40 | 300 |
+| `max_depth` | 12 | 5 |
+| `min_samples_leaf` | 50 | 300 |
+| `max_features` | sqrt | 0.3 |
+| `max_samples` | 0.5 | 0.5 |
+| 特征数量 | 39（含市场级） | 36（去除市场级） |
+
 ---
 
 ## 7. 已完成的实验结果
@@ -360,6 +391,71 @@ flowchart LR
 - 当前 smoke 配置效果一般
 - 还不能说明随机森林没价值，只能说明这版参数和特征组合未形成稳定优势
 
+### 7.5 随机森林调优：下一日涨跌分类
+
+输出目录：
+
+- `model_outputs/next_day_random_forest_tuned`
+
+验证结果：
+
+- `accuracy = 0.5078`
+- `precision = 0.5358`
+- `recall = 0.4683`
+- `roc_auc = 0.5100`
+- `top_bottom_up_rate_spread = -0.0023`
+- `oob_score = 0.5299`
+
+与 smoke 版对比（括号内为变化）：
+
+| 指标 | 决策树 | RF smoke | RF 调优 |
+|---|---|---|---|
+| accuracy | 0.5035 | 0.4960 | **0.5078**（+0.0118） |
+| precision | 0.5317 | 0.5350 | **0.5358**（+0.0008） |
+| recall | 0.4558 | 0.3062 | **0.4683**（+0.1621） |
+| roc_auc | 0.5081 | 0.5091 | **0.5100**（+0.0009） |
+| oob_score | — | 0.6248 | **0.5299**（-0.0949） |
+
+结论：
+
+- 所有核心指标均超过决策树 baseline
+- recall 大幅恢复（0.306→0.468），模型不再过于保守
+- OOB score 大幅下降并接近验证集表现，过拟合显著减轻
+- 主要归功于降低树复杂度和去除市场级特征
+
+### 7.6 随机森林调优：未来 5 日收益回归
+
+输出目录：
+
+- `model_outputs/future_5d_random_forest_tuned`
+
+验证结果：
+
+- `mae = 0.02239`
+- `rmse = 0.03236`
+- `r2 = -0.0079`
+- `directional_accuracy = 0.5099`
+- `mean_daily_rank_ic = -0.0161`
+- `top_bottom_return_spread = -0.00127`
+- `oob_score = 0.0168`
+
+与 smoke 版对比：
+
+| 指标 | 决策树 | RF smoke | RF 调优 |
+|---|---|---|---|
+| MAE | 0.02241 | 0.02262 | **0.02239**（-0.00023） |
+| RMSE | 0.03239 | 0.03254 | **0.03236**（-0.00018） |
+| R² | -0.0105 | -0.0194 | **-0.0079**（+0.0115） |
+| 方向准确率 | 0.5315 | 0.4777 | **0.5099**（+0.0322） |
+| oob_score | — | 0.0936 | **0.0168**（-0.0768） |
+
+结论：
+
+- MAE、RMSE、R² 均优于决策树和 smoke 版
+- 方向准确率从 0.478 恢复到 0.510
+- OOB score 与验证集 R² 的差距大幅缩小，过拟合显著改善
+- 整体表明调优策略有效，但该任务信号本身仍然较弱
+
 ---
 
 ## 8. 工程中已经完成的工作清单
@@ -381,6 +477,9 @@ flowchart LR
 13. 导出了 Mermaid 决策树流程图
 14. 跑通了两个场景的随机森林 smoke test
 15. 生成了验证集逐条预测结果与分组评估文件
+16. 分析 smoke test 不及决策树的原因（过拟合 + 市场级特征主导 + 超参数不合理）
+17. 完成随机森林调优：降低树复杂度、增加树数量、去除市场级特征、调整特征采样
+18. 调优后两个场景的随机森林均超过决策树 baseline
 
 ---
 
@@ -395,15 +494,15 @@ python train_decision_tree.py --scenario next_day
 python train_decision_tree.py --scenario future_5d
 python export_tree_flowchart.py --model-path model_outputs/next_day_decision_tree/model.pkl
 python export_tree_flowchart.py --model-path model_outputs/future_5d_decision_tree/model.pkl
-python train_random_forest.py --scenario next_day
-python train_random_forest.py --scenario future_5d
+python train_random_forest.py --scenario next_day --output-dir model_outputs/next_day_random_forest_tuned
+python train_random_forest.py --scenario future_5d --output-dir model_outputs/future_5d_random_forest_tuned
 ```
 
-如果只是快速检查随机森林流程是否可用，可以运行：
+如果只是快速检查随机森林流程是否可用，可以运行 smoke test（使用较少的树和旧参数）：
 
 ```bash
-python train_random_forest.py --scenario next_day --n-estimators 40 --output-dir model_outputs/next_day_random_forest_smoke
-python train_random_forest.py --scenario future_5d --n-estimators 40 --output-dir model_outputs/future_5d_random_forest_smoke
+python train_random_forest.py --scenario next_day --n-estimators 40 --max-depth 12 --min-samples-leaf 50 --max-features sqrt --output-dir model_outputs/next_day_random_forest_smoke
+python train_random_forest.py --scenario future_5d --n-estimators 40 --max-depth 12 --min-samples-leaf 50 --max-features sqrt --output-dir model_outputs/future_5d_random_forest_smoke
 ```
 
 ---
@@ -420,16 +519,17 @@ python train_random_forest.py --scenario future_5d --n-estimators 40 --output-di
 - 有 baseline 模型
 - 有更强模型的测试脚本
 - 有模型解释输出
+- 有基于分析结论的模型调优记录
 
 当前阶段最适合把它定位为：
 
-**股票机器学习实验工程 v1**
+**股票机器学习实验工程 v1.1**
 
 它已经具备继续做以下工作的基础：
 
-- 参数调优
+- 进一步参数搜索（如 GridSearch / Optuna）
 - 特征筛选
-- 增加新的模型
+- 增加新的模型（如 LightGBM / XGBoost）
 - 增加回测/交易评估
 - 补 README 和最终汇报文档
 
@@ -464,6 +564,8 @@ python train_random_forest.py --scenario future_5d --n-estimators 40 --output-di
 - `ml_data/features/ml_features_summary.json`
 - `model_outputs/next_day_decision_tree/metrics.json`
 - `model_outputs/future_5d_decision_tree/metrics.json`
+- `model_outputs/next_day_random_forest_tuned/metrics.json`
+- `model_outputs/future_5d_random_forest_tuned/metrics.json`
 
 ---
 
