@@ -10,7 +10,7 @@ def run_rolling_window_tests():
     Run rolling window tests
     """
     # Load and preprocess data
-    df = load_and_preprocess_data('training_data/Stock A.xlsx')
+    df = load_and_preprocess_data('../training_data/Stock A.xlsx')
     df = create_features(df)
     
     # Generate rolling windows

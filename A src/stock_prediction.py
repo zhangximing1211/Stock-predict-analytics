@@ -26,7 +26,7 @@ def main():
         print("Loading and preprocessing data...")
         
         # Load and preprocess data
-        df = load_and_preprocess_data('training_data/Stock A.xlsx')
+        df = load_and_preprocess_data('../training_data/Stock A.xlsx')
         df = create_features(df)
         
         print(f"Data loaded successfully, total {len(df)} records")
