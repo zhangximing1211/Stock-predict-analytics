@@ -3,6 +3,8 @@
 
 # Model artifacts
 *.pkl
+*.joblib
+saved_models/
 
 # Python
 __pycache__/
